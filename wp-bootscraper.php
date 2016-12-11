@@ -3,7 +3,7 @@
 	Plugin Name: WordPress Bootscraper
 	Plugin URI: http://www.navz.me
 	Description: Scrap out things you don't need on your WordPress
-	Version: 1.0.0
+	Version: 2.0.0
 	Author: Navneil Naicer
 	Author URI: http://www.navz.me
 	License: GPLv2 or later
@@ -37,6 +37,7 @@ class wpbootscraper{
 	private $admin_url = null;
 	private $plugin_url = null;
 	private $plugin_path = null;
+	private $plugin_version = '2.0.0';
 	
 	public function __construct(){
 		$this->admin_url = admin_url('/tools.php?page=' . $this->slug);
@@ -58,8 +59,8 @@ class wpbootscraper{
 		if ( 'tools_page_wp-bootscraper' != $hook ){
 			return;
     }
-		wp_enqueue_style($this->slug, $this->plugin_url . $this->slug . '.css');
-    wp_enqueue_script($this->slug, $this->plugin_url . $this->slug . '.js', array(), '1.0', true);
+		wp_enqueue_style($this->slug, $this->plugin_url . $this->slug . '.css', $this->plugin_version);
+    wp_enqueue_script($this->slug, $this->plugin_url . $this->slug . '.js', array(), $this->plugin_version, true);
 	}
 	
 	public function frontend(){
@@ -395,8 +396,8 @@ function save_wp_bootscraper(){
 				if( !empty($request['administrator_footer_thankyou']) and $request['administrator_footer_thankyou'] == 1 ){
 					$data['administrator_footer_thankyou'] = 1;
 				}
-				if( !empty($request['administrator_footer_thankyou_text']) and $request['administrator_footer_thankyou_text'] == 1 ){
-					$data['administrator_footer_thankyou_text'] = sanitize_text_field($request['administrator_footer_thankyou_text']);
+				if( !empty($request['administrator_footer_thankyou_text']) ){
+					$data['administrator_footer_thankyou_text'] = esc_html($request['administrator_footer_thankyou_text']);
 				}
 			}
 			
