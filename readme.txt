@@ -3,7 +3,7 @@ Contributors: navzme
 Tags: core, admin, site, frontend, clean, cleanup, safe, header, scripts
 Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,11 @@ WordPress comes with a lot of pre-loaded styles and scripts which are not necess
 * Remove Comments from side menu
 * Move ACF menu under Settings as submenu
 * Move CTP UI menu under Settings as submenu
+* Move WordPress SEO under Settings as submenu
+* Remove WordPress SEO Metabox from Post
+* Remove WordPress SEO Metabox from Page
+* Remove WordPress SEO Column from Post
+* Remove WordPress SEO Column from Page
 * Remove Trackback metabox
 * Remove Comment metabox
 * Remove Author metabox
@@ -41,8 +46,8 @@ WordPress comes with a lot of pre-loaded styles and scripts which are not necess
 * Remove Post by Email from Writing
 * Change footer thank you
 
-= Website =
-http://www.navz.me/
+= If you wanna discuss anything =
+https://www.navz.me/
 
 = Please Vote and Enjoy =
 Your votes really make a difference! Thanks.
@@ -55,7 +60,15 @@ Your votes really make a difference! Thanks.
 
 == Changelog ==
 
-= 2.0 =
+= 2.1.0 =
+* [Fixed] disable_embeds_rewrites on WordPress 4.7.3 PHP 7
+* [Added] Move WordPress SEO under Settings as submenu
+* [Added] Remove WordPress SEO Metabox from Post
+* [Added] Remove WordPress SEO Metabox from Page
+* [Added] Remove WordPress SEO Column from Post
+* [Added] Remove WordPress SEO Column from Page
+
+= 2.0.0 =
 * [Fixed] Administrator footer thank you functionality
 * [Test] Compatible with WordPress 4.7
 

@@ -3,7 +3,7 @@
 	Plugin Name: WordPress Bootscraper
 	Plugin URI: http://www.navz.me
 	Description: Scrap out things you don't need on your WordPress
-	Version: 2.0.0
+	Version: 2.1.0
 	Author: Navneil Naicer
 	Author URI: http://www.navz.me
 	License: GPLv2 or later
@@ -88,13 +88,13 @@ class wpbootscraper{
 		}
 		
 		if( !empty($settings['frontend_remove_dns_prefetch_to_s_w_org']) ){
-			function remove_dns_prefetch( $hints, $relation_type ) {
+			function wp_bootscraper_remove_dns_prefetch( $hints, $relation_type ) {
 				if ( 'dns-prefetch' === $relation_type ) {
 					return array_diff( wp_dependencies_unique_hosts(), $hints );
 				}
 				return $hints;
 			}
-			add_filter( 'wp_resource_hints', 'remove_dns_prefetch', 10, 2 );
+			add_filter( 'wp_resource_hints', 'wp_bootscraper_remove_dns_prefetch', 10, 2 );
 		}
 
 		if( !empty($settings['frontend_remove_wp_json']) ){
@@ -113,7 +113,7 @@ class wpbootscraper{
 			// Remove oEmbed-specific JavaScript from the front-end and back-end.
 			remove_action( 'wp_head', 'wp_oembed_add_host_js' );
 			// Remove all embeds rewrite rules.
-			add_filter( 'rewrite_rules_array', 'disable_embeds_rewrites' );
+			//add_filter( 'rewrite_rules_array', 'disable_embeds_rewrites' );
 		}
 
 		if( !empty($settings['frontend_remove_wordpress_generator']) ){
@@ -131,59 +131,116 @@ class wpbootscraper{
 		$settings = unserialize($settings);
 		
 		if( !empty($settings['administrator_remove_wp_logo_from_toolbar']) ){
-				add_action( 'admin_bar_menu', 'remove_wp_logo', 999 );
-				function remove_wp_logo( $wp_admin_bar ) {
+				add_action( 'admin_bar_menu', 'wp_bootscraper_remove_wp_logo', 999 );
+				function wp_bootscraper_remove_wp_logo( $wp_admin_bar ) {
 					$wp_admin_bar->remove_node( 'wp-logo' );
 				}
 		}
 		
 		if( !empty($settings['administrator_remove_comment_link_from_toolbar']) ){
-			function my_admin_bar_render() {
+			function wp_bootscraper_admin_bar_render() {
 				global $wp_admin_bar;
 				$wp_admin_bar->remove_menu('comments');
 			}
-			add_action( 'wp_before_admin_bar_render', 'my_admin_bar_render' );
+			add_action( 'wp_before_admin_bar_render', 'wp_bootscraper_admin_bar_render' );
 		}
 		
 		if( !empty($settings['administrator_remove_new_link_from_toolbar']) ){
-			add_action( 'admin_bar_menu', 'remove_wp_nodes', 999 );
-			function remove_wp_nodes(){
+			add_action( 'admin_bar_menu', 'wp_bootscraper_remove_wp_nodes', 999 );
+			function wp_bootscraper_remove_wp_nodes(){
 				global $wp_admin_bar;   
 				$wp_admin_bar->remove_node( 'new-content' );
 			}
 		}
 		
 		if( !empty($settings['administrator_remove_post_from_side_menu']) ){
-			function remove_post_menu(){
+			function wp_bootscraper_remove_post_menu(){
 				remove_menu_page('edit.php');
 			}
-			add_action('admin_menu', 'remove_post_menu');
+			add_action('admin_menu', 'wp_bootscraper_remove_post_menu');
 		}
 		
 		if( !empty($settings['administrator_remove_comments_from_side_menu']) ){
-			function remove_comment_menu(){
+			function wp_bootscraper_remove_comment_menu(){
 				remove_menu_page('edit-comments.php');
 			}
-			add_action('admin_menu', 'remove_comment_menu');
+			add_action('admin_menu', 'wp_bootscraper_remove_comment_menu');
 		}
 		
 		if( !empty($settings['administrator_move_acf_under_settings']) ){
-			add_action('admin_menu', 'move_acf_under_settings');
-			function move_acf_under_settings() {
+			add_action('admin_menu', 'wp_bootscraper_move_acf_under_settings');
+			function wp_bootscraper_move_acf_under_settings() {
 				add_filter('acf/settings/show_admin', '__return_false');
 				add_options_page('Custom Fields', 'Custom Fields', 'manage_options', '/edit.php?post_type=acf');
 			}
-			function remove_acf_menu() {
+			function wp_bootscraper_remove_acf_menu() {
 				remove_menu_page('edit.php?post_type=acf');
 			}
-			add_action( 'admin_menu', 'remove_acf_menu', 999);
+			add_action( 'admin_menu', 'wp_bootscraper_remove_acf_menu', 999);
 		}
-		
+
 		if( !empty($settings['administrator_move_ctp_ui_under_settings']) ){
-			add_action('admin_menu', 'move_cpt_ui_under_settings');
-			function move_cpt_ui_under_settings() {
+			add_action('admin_menu', 'wp_bootscraper_move_cpt_ui_under_settings');
+			function wp_bootscraper_move_cpt_ui_under_settings() {
 				add_options_page('Post Types', 'Post Types', 'manage_options', '/admin.php?page=cptui_manage_post_types');
 			}
+		}		
+		
+		if( !empty($settings['administrator_move_wpseo_under_settings']) ){
+			add_action('admin_menu', 'wp_bootscraper_move_wpseo_under_settings');
+			function wp_bootscraper_move_wpseo_under_settings() {
+				add_options_page('SEO/SMO', 'SEO/SMO', 'manage_options', '/admin.php?page=wpseo_dashboard');
+			}
+			function wp_bootscraper_remove_wpseo_menu() {
+				remove_menu_page('wpseo_dashboard');
+			}
+			add_action( 'admin_menu', 'wp_bootscraper_remove_wpseo_menu', 999);
+		}
+		
+		if( !empty($settings['administrator_remove_wordpress_seo_metabox_from_post']) ){
+			function wp_bootscraper_post_wpse_init(){
+				add_filter('wpseo_use_page_analysis', '__return_false');
+				add_action('add_meta_boxes', 'wp_bootscraper_disable_seo_post_metabox', 100000);
+			}
+			add_action('init', 'wp_bootscraper_post_wpse_init');
+			function wp_bootscraper_disable_seo_post_metabox(){
+				remove_meta_box('wpseo_meta', 'post', 'normal');
+			}
+		}
+
+		if( !empty($settings['administrator_remove_wordpress_seo_metabox_from_page']) ){
+			function wp_bootscraper_page_wpse_init(){
+				add_filter('wpseo_use_page_analysis', '__return_false');
+				add_action('add_meta_boxes', 'wp_bootscraper_disable_seo_page_metabox', 100000);
+			}
+			add_action('init', 'wp_bootscraper_page_wpse_init');
+			function wp_bootscraper_disable_seo_page_metabox(){
+				remove_meta_box('wpseo_meta', 'page', 'normal');
+			}			
+		}
+
+		if( !empty($settings['administrator_remove_wordpress_seo_column_from_post']) ){
+			function wp_bootscraper_remove_post_seo_columns( $columns ) {
+				unset( $columns['wpseo-score'] );
+				unset( $columns['wpseo-title'] );
+				unset( $columns['wpseo-metadesc'] );
+				unset( $columns['wpseo-focuskw'] );
+				unset( $columns['wpseo-score-readability'] );
+				return $columns;
+			}
+			add_filter ( 'manage_edit-post_columns', 'wp_bootscraper_remove_post_seo_columns' );	
+		}
+
+		if( !empty($settings['administrator_remove_wordpress_seo_column_from_page']) ){
+			function wp_bootscraper_remove_page_seo_columns( $columns ) {
+				unset( $columns['wpseo-score'] );
+				unset( $columns['wpseo-title'] );
+				unset( $columns['wpseo-metadesc'] );
+				unset( $columns['wpseo-focuskw'] );
+				unset( $columns['wpseo-score-readability'] );
+				return $columns;
+			}
+			add_filter ( 'manage_edit-page_columns', 'wp_bootscraper_remove_page_seo_columns' );				
 		}
 		
 		if( !empty($settings['administrator_remove_trackback_metabox']) ){
@@ -252,7 +309,7 @@ class wpbootscraper{
 		
 		if( !empty($settings['administrator_completely_turn_off_commenting_functionality']) ){
 			// Disable support for comments and trackbacks in post types
-			function df_disable_comments_post_types_support() {
+			function wp_bootscraper_disable_comments_post_types_support() {
 				$post_types = get_post_types();
 				foreach ($post_types as $post_type) {
 					if(post_type_supports($post_type, 'comments')) {
@@ -261,50 +318,50 @@ class wpbootscraper{
 					}
 				}
 			}
-			add_action('admin_init', 'df_disable_comments_post_types_support');
+			add_action('admin_init', 'wp_bootscraper_disable_comments_post_types_support');
 			
 			// Close comments on the front-end
-			function df_disable_comments_status(){
+			function wp_bootscraper_disable_comments_status(){
 				return false;
 			}
-			add_filter('comments_open', 'df_disable_comments_status', 20, 2);
-			add_filter('pings_open', 'df_disable_comments_status', 20, 2);
+			add_filter('comments_open', 'wp_bootscraper_disable_comments_status', 20, 2);
+			add_filter('pings_open', 'wp_bootscraper_disable_comments_status', 20, 2);
 			
 			// Hide existing comments
-			function df_disable_comments_hide_existing_comments($comments) {
+			function wp_bootscraper_disable_comments_hide_existing_comments($comments) {
 				$comments = array();
 				return $comments;
 			}
-			add_filter('comments_array', 'df_disable_comments_hide_existing_comments', 10, 2);
+			add_filter('comments_array', 'wp_bootscraper_disable_comments_hide_existing_comments', 10, 2);
 			
 			// Remove comments page in menu
-			function df_disable_comments_admin_menu() {
+			function wp_bootscraper_disable_comments_admin_menu() {
 				remove_menu_page('edit-comments.php');
 			}
-			add_action('admin_menu', 'df_disable_comments_admin_menu');
+			add_action('admin_menu', 'wp_bootscraper_disable_comments_admin_menu');
 			
 			// Redirect any user trying to access comments page
-			function df_disable_comments_admin_menu_redirect() {
+			function wp_bootscraper_disable_comments_admin_menu_redirect() {
 				global $pagenow;
 				if ($pagenow === 'edit-comments.php') {
 					wp_redirect(admin_url()); exit;
 				}
 			}
-			add_action('admin_init', 'df_disable_comments_admin_menu_redirect');
+			add_action('admin_init', 'wp_bootscraper_disable_comments_admin_menu_redirect');
 			
 			// Remove comments metabox from dashboard
-			function df_disable_comments_dashboard() {
+			function wp_bootscraper_disable_comments_dashboard() {
 				remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
 			}
-			add_action('admin_init', 'df_disable_comments_dashboard');
+			add_action('admin_init', 'wp_bootscraper_disable_comments_dashboard');
 			
 			// Remove comments links from admin bar
-			function df_disable_comments_admin_bar() {
+			function wp_bootscraper_disable_comments_admin_bar() {
 				if (is_admin_bar_showing()) {
 					remove_action('admin_bar_menu', 'wp_admin_bar_comments_menu', 60);
 				}
 			}
-			add_action('init', 'df_disable_comments_admin_bar');
+			add_action('init', 'wp_bootscraper_disable_comments_admin_bar');
 		}
 		
 	}
@@ -365,6 +422,21 @@ function save_wp_bootscraper(){
 				}
 				if( !empty($request['administrator_move_ctp_ui_under_settings']) and $request['administrator_move_ctp_ui_under_settings'] == 1 ){
 					$data['administrator_move_ctp_ui_under_settings'] = 1;
+				}
+				if( !empty($request['administrator_move_wpseo_under_settings']) and $request['administrator_move_wpseo_under_settings'] == 1 ){
+					$data['administrator_move_wpseo_under_settings'] = 1;
+				}
+				if( !empty($request['administrator_remove_wordpress_seo_metabox_from_post']) and $request['administrator_remove_wordpress_seo_metabox_from_post'] == 1 ){
+					$data['administrator_remove_wordpress_seo_metabox_from_post'] = 1;
+				}
+				if( !empty($request['administrator_remove_wordpress_seo_metabox_from_page']) and $request['administrator_remove_wordpress_seo_metabox_from_page'] == 1 ){
+					$data['administrator_remove_wordpress_seo_metabox_from_page'] = 1;
+				}
+				if( !empty($request['administrator_remove_wordpress_seo_column_from_post']) and $request['administrator_remove_wordpress_seo_column_from_post'] == 1 ){
+					$data['administrator_remove_wordpress_seo_column_from_post'] = 1;
+				}
+				if( !empty($request['administrator_remove_wordpress_seo_column_from_page']) and $request['administrator_remove_wordpress_seo_column_from_page'] == 1 ){
+					$data['administrator_remove_wordpress_seo_column_from_page'] = 1;
 				}
 				if( !empty($request['administrator_remove_trackback_metabox']) and $request['administrator_remove_trackback_metabox'] == 1 ){
 					$data['administrator_remove_trackback_metabox'] = 1;
