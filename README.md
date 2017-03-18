@@ -19,6 +19,11 @@ WordPress comes with a lot of pre-loaded styles and scripts which are not necess
 * Remove Comments from side menu
 * Move ACF menu under Settings as submenu
 * Move CTP UI menu under Settings as submenu
+* Move WordPress SEO under Settings as submenu
+* Remove WordPress SEO Metabox from Post
+* Remove WordPress SEO Metabox from Page
+* Remove WordPress SEO Column from Post
+* Remove WordPress SEO Column from Page
 * Remove Trackback metabox
 * Remove Comment metabox
 * Remove Author metabox
